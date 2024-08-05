@@ -3,7 +3,11 @@ import { ErrorMessage, useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import TableSinhVien from "./TableSinhVien";
 import InputCustom from "./InputCustom";
-import { getValueLocalStorage, setValueLocalStorage } from "../../utils/util";
+import {
+  getValueLocalStorage,
+  removeAccentsAndSpaces,
+  setValueLocalStorage,
+} from "../../utils/util";
 import * as yup from "yup";
 
 const ReactForm = () => {
@@ -12,6 +16,9 @@ const ReactForm = () => {
 
   // sửa thông tin nhân viên
   const [sinhVien, setSinhVien] = useState();
+
+  // search sinh viên
+  const [inputValue, setInputValue] = useState("");
 
   // truyền dữ liệu mặc định object vào useFormik
   const {
@@ -132,6 +139,7 @@ const ReactForm = () => {
               onBlur={handleBlur}
               errors={errors.mssv}
               touched={touched.mssv}
+              disabled
             />
             {/* name */}
             <InputCustom
@@ -206,6 +214,7 @@ const ReactForm = () => {
                 format="DD-MM-YYYY"
               />
             </div>
+
             {/* action */}
             <div className="space-x-5">
               <button
@@ -251,6 +260,55 @@ const ReactForm = () => {
           </div>
         </form>
       </div>
+
+      <div className="my-8">
+        <div className="relative">
+          <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            <svg
+              className="w-4 h-4 text-gray-500 dark:text-gray-400"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 20 20"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+              />
+            </svg>
+          </div>
+          <input
+            type="search"
+            id="default-search"
+            className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50"
+            placeholder="Nhập tên sinh viên"
+            required
+            onChange={() => {
+              setInputValue(event.target.value);
+            }}
+          />
+          <button
+            type="button"
+            className="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-4 py-2"
+            onClick={() => {
+              let keyWord = removeAccentsAndSpaces(inputValue);
+              console.log(keyWord);
+              console.log(arrSinhVien);
+              let arrSinhVienFilter = arrSinhVien.filter((item) => {
+                let newSinhVien = removeAccentsAndSpaces(item.name);
+                return newSinhVien.includes(keyWord);
+              });
+              setArrSinhVien(arrSinhVienFilter);
+            }}
+          >
+            Search
+          </button>
+        </div>
+      </div>
+
       <TableSinhVien
         arrSinhVien={arrSinhVien}
         handleDelete={handleDeleteSinhVien}
